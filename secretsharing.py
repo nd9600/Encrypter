@@ -5,7 +5,7 @@ from random import SystemRandom
 def insistentFunction(numberOfParts, threshold):
     booleanValue = True
     try:
-        if ((type(threshold) is not int) or (threshold >= numberOfParts)):
+        if ((type(threshold) is not int) or (threshold > numberOfParts)):
             raise Exception, "%s is not a valid integer" % (threshold)
     except Exception as e:
         print e
@@ -52,7 +52,7 @@ def splitSecret():
         codepointsInBinary = codepointsInBinary + paddedCodepointInBinary
     codepointsInDecimal = int(codepointsInBinary, 2)
     print "codepointsInBinary:", codepointsInBinary
-    print "codepointsInDecimal:", int(codepointsInBinary, 2)
+    print "codepointsInDecimal:", codepointsInDecimal
     
     numberOfParts = input("Number of parts: ")
     thresholdBooleanValue = False
