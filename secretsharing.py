@@ -88,14 +88,6 @@ def splitSecret():
     print "paddedPadLengthInBinary:", paddedPadLengthInBinary
     print "prependedCodepoints:", prependedCodepoints
     
-    print ""
-    for i in range(0, len(paddedCodepoints), primeBits):
-        count = i/primeBits
-        bits = paddedCodepoints[i:i+primeBits]
-        print "%sth %s bits: %s" % (count, primeBits , bits)
-    
-    return
-    
     #####To get shares#####
     #Get secret
     #Get pad length
@@ -104,16 +96,17 @@ def splitSecret():
     #Pad binary codepoints to the next multiple of padLength
     #DONE#Pad padLength to 11 bit integer, prepend it to padded codepoints
     #Get shares for each successive _primeBits_ bits, prepend x value like original, store each share in order as x+comma+_primeBits_ bit string
+    #Pad y value to _primeBits_ bits in binary, convert to decimal
     #Overall share #n = prepend primeBits and concatenation of nth shares (share[n])(ie a collection of the correct shares)
     #secret (not actually a secret) 1 = secret of 1st _primeBits_ bits = [1-abc, 2-def, 3-ghi]
     #secret 2 = secret of 2nd _primeBits_ bits =  [1-ABC, 2-DEF, 3-GHI]
-    #Overall share 1 = BITS-1-abcABC, 2 = BITS-2-defDEF, 3 = BITS-3-ghiGHI etc
+    #Overall share 1 = BITS-primeBits-1-abcABC, 2 = BITS-2-defDEF, 3 = BITS-3-ghiGHI etc
     #####To get secret#####
     #Get coordinates of each successive _primeBits_ bits, splitShare[0] = primeBits, splitShare[1] = x, splitShare[2] = y (y = all individual shares for x)
     #Loop through each overall share for each successive _primeBits_ bits
-    #Combine ith shares for same x value for each successive _primeBits_ bits to form overall share for ith _primeBits_ bits to get astual individual _primeBits_ bits
+    #Combine ith shares for same x value for each successive _primeBits_ bits to form overall share for ith _primeBits_ bits to get actual individual _primeBits_ bits
     #[BITS-1-abcABC, BITS-2-defDEF, BITS-3-ghiGHI]
-    #[BITS-1-abcABC,
+    #[BITS-1-abcABC
     #[BITS-2-defDEF
     #[BITS-3-ghiGHI]
     #[1-abc, 2-def, 3-ghi]
@@ -130,8 +123,15 @@ def splitSecret():
     
     #Converts binary to polynomial to points in polynomial to shares
     print ""
-    shares = getShares(secret, numberOfParts, threshold)
-    print "shares:", shares
+    overallShares = {}
+    for i in range(0, len(paddedCodepoints), primeBits):
+        count = i/primeBits
+        bits = paddedCodepoints[i:i+primeBits]
+        print "%sth %s bits: %s" % (count, primeBits , bits)
+        individualShares = getShares(secret, numberOfParts, threshold)
+        #overallShares[i] = 
+    
+    print "overallShares:", overallShares
     print "#####"
     
 def getPolynomial(coordinates):
@@ -151,15 +151,9 @@ def getPolynomial(coordinates):
     for i in range(0,numberOfPoints):
         for j in range(0,numberOfPoints):
             if (j == i):
-                if i in setOfPoints:
-                    setOfPoints[i].append( [coordinates[i][0], coordinates[i][1]] )
-                else:
-                    setOfPoints[i] = [ [coordinates[i][0], coordinates[i][1]] ]
+                setOfPoints[i] = setOfPoints.get( i, [] ) + [[coordinates[i][0], coordinates[i][1]]]
             elif (j != i):
-                if i in setOfPoints:
-                    setOfPoints[i].append([coordinates[j][0], 0])
-                else:
-                    setOfPoints[i] = [ [coordinates[j][0], 0] ]
+                setOfPoints[i] = setOfPoints.get( i, [] ) + [[coordinates[j][0], 0]]
 
     #Creates a polynomial for each of the coordinates of the previous dictionary where y is non-zero, 
     #subs in the other coordinate to find the constant a
@@ -195,7 +189,6 @@ def getPolynomial(coordinates):
     
     #Sums each polynomial and expands it into a simpler form
     finalPolynomial = expand(summedEquations)
-    #finalPolynomial = (expand(summedEquations) % 2**primeBits)
     return finalPolynomial
 
 def reconstructSecret():   
