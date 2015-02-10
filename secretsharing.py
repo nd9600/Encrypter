@@ -214,15 +214,27 @@ def getPolynomial(coordinates):
         
         #print ""
         #print "setOfPoints[{0}]: {1}".format(i, setOfPoints[i])
-        
-        #Subs in the non-zero coordinates
-        unSubbedEquation = sympy.Eq(y, setOfEquations[i])
-        subbedEquation = unSubbedEquation.subs([ (y, setOfPoints[i][i][1]), (x, setOfPoints[i][i][0]) ] )
-        #Solves each polynomial to find the constant a, and subs into the final set
-        solutionForA = sympy.solve(subbedEquation, a)[0]
-        setOfSubbedEquations[i] = setOfEquations[i].subs(a, solutionForA)
         #print "setOfEquations[{0}]: {1}".format(i, setOfEquations[i]) 
-        #print "a:", solutionForA
+        
+        allZeroBoolean = True
+        for j in range(0, len(setOfPoints[i]) ):
+            if (setOfPoints[i][j][1] != 0):
+                allZeroBoolean = False
+                break
+            else:
+                continue
+                
+        if (allZeroBoolean):
+            setOfSubbedEquations[i] = 0 * x
+        else:
+            #Subs in the non-zero coordinates
+            unSubbedEquation = sympy.Eq(y, setOfEquations[i])
+            subbedEquation = unSubbedEquation.subs([ (y, setOfPoints[i][i][1]), (x, setOfPoints[i][i][0]) ] )
+            #Solves each polynomial to find the constant a, and subs into the final set
+            solutionForA = sympy.solve(subbedEquation, a)[0]
+            setOfSubbedEquations[i] = setOfEquations[i].subs(a, solutionForA)
+            #print "solutionForA:", solutionForA
+
         #print "setOfSubbedEquations[{0}]: {1}".format(i, setOfSubbedEquations[i])
 
     summedEquations = sum(setOfSubbedEquations.itervalues())
