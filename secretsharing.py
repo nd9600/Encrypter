@@ -13,17 +13,6 @@ def insistentFunction(numberOfParts, threshold):
         
     return booleanValue
     
-#Pads overall codepoints by _padLength_ number of zeros    
-def padCodepointsInBinary(codepointsInBinary, padLength):
-    lengthOfCodepoints = len(codepointsInBinary)
-    zerosToAdd = 0
-    if ( (padLength != 0) and ( (lengthOfCodepoints%padLength) != 0 ) ):
-        zerosToAdd = ( padLength - (lengthOfCodepoints%padLength) )  
-    paddedCodepoints = zerosToAdd*"0" + codepointsInBinary
-    print "paddedCodepoints:", paddedCodepoints
-    return paddedCodepoints, zerosToAdd
-    
-    
 def getShares(secret, numberOfParts, threshold, primeBits):
     rng = random.SystemRandom()
     randomNumbers = {}
@@ -65,48 +54,43 @@ def splitSecret(secret, numberOfParts, threshold, primeBits = 8, padLength = 0):
     print ""    
     print "codepointsInBinary:", codepointsInBinary
     
+    #Pads overall codepoints by _padLength_ number of zeros
+    lengthOfCodepoints = len(codepointsInBinary)
+    zerosToAdd = 0
+    if ( (padLength != 0) and ( (lengthOfCodepoints%padLength) != 0 ) ):
+        zerosToAdd = ( padLength - (lengthOfCodepoints%padLength) )  
+    paddedCodepoints = zerosToAdd*"0" + codepointsInBinary
+        
+    #Pads zerosToAdd to a 16 bit integer, and prepends it to the padded codepoints
+    zerosToAddInBinary = bin(zerosToAdd)[2:]
+    lengthOfZerosToAddInBinary = len(zerosToAddInBinary)
+    zerosToAddToZerosToAdd = 0
+    if (lengthOfZerosToAddInBinary%16) != 0:
+        zerosToAddToZerosToAdd = ( 16 - (lengthOfZerosToAddInBinary%16) ) 
+    paddedZerosToAddInBinaryInBinary = zerosToAddToZerosToAdd*"0" + zerosToAddInBinary
+    prependedCodepoints = paddedZerosToAddInBinaryInBinary + paddedCodepoints
+    
+    #Calculates new numberOfSections until _primeBits_ doesn't change
     newPrimeBits1 = 0
     newPrimeBits2 = primeBits 
-    zerosToAdd = 0
-    zerosToAddInBinary = ""
-    zerosToAddToZerosToAdd = 0
-    paddedZerosToAddInBinaryInBinary = ""
-    paddedCodepoints = ""
-    prependedCodepoints = ""
     numberOfSections = 0
-    #Pads overall codepoints 
     while (newPrimeBits1 != newPrimeBits2):
         newPrimeBits1 = newPrimeBits2
-        paddedCodepoints, zerosToAdd  = padCodepointsInBinary(codepointsInBinary, padLength)
-        
-        #Pads zerosToAdd to an 16 bit integer, and prepends it to the padded codepoints
-        zerosToAddInBinary = bin(zerosToAdd)[2:]
-        lengthOfZerosToAddInBinary = len(zerosToAddInBinary)
-        zerosToAddToZerosToAdd = 0
-        if (lengthOfZerosToAddInBinary%16) != 0:
-            zerosToAddToZerosToAdd = ( 16 - (lengthOfZerosToAddInBinary%16) ) 
-        paddedZerosToAddInBinaryInBinary = zerosToAddToZerosToAdd*"0" + zerosToAddInBinary
-        prependedCodepoints = paddedZerosToAddInBinaryInBinary + paddedCodepoints
         numberOfSections = len(prependedCodepoints)/newPrimeBits1
         
         minimumPrimeBitsForNumberOfSections = int(math.ceil(math.log(numberOfSections*2, 2) + 1))
-        newPrimeBits2 = max(minimumPrimeBitsForNumberOfSections, minimumPrimeBitsForNumberOfShares)
-            
+        minimumPrimeBits = max(minimumPrimeBitsForNumberOfSections, minimumPrimeBitsForNumberOfShares)
+        newPrimeBits2 = max(primeBits, minimumPrimeBits)
     primeBits = newPrimeBits2
+    newNumberOfSections = len(prependedCodepoints)/primeBits
     
-    print "primeBits:", primeBits
+    print ""
     print "zerosToAdd:", zerosToAdd
     print "zerosToAddInBinary:", zerosToAddInBinary
     print "zerosToAddToZerosToAdd:", zerosToAddToZerosToAdd
     print "paddedZerosToAddInBinaryInBinary:", paddedZerosToAddInBinaryInBinary
     print "len(paddedZerosToAddInBinaryInBinary):", len(paddedZerosToAddInBinaryInBinary)
-    print "prependedCodepoints:", prependedCodepoints
-    print "len(prependedCodepoints):", len(prependedCodepoints)
-    print "numberOfSections before using changed primeBits:", numberOfSections
-
-    newNumberOfSections = len(prependedCodepoints)/primeBits
-    
-    print ""
+    print "paddedCodepoints:", paddedCodepoints
     print "prependedCodepoints:", prependedCodepoints
     print "len(prependedCodepoints):", len(prependedCodepoints)
     print "number of newPrimeBits sections:", newNumberOfSections
@@ -355,6 +339,9 @@ def reconstructSecretFromShares(overallSharesCombined):
             primeBitsSecret = 0
         
         listOfSecretsInDecimal.append(primeBitsSecret)
+        
+        #Pads primeBitsSecretInBinary to the required number of digits; if not the last section, then _primeBits_ length, else the number of digits required to make codepointsInBinary % 16 = 0:
+        #codepointsInBinary = prependedCodepoints - padLength - zerosPrepended, zerosToAdd = normal no. of zeros - length of current primeBitsSecretInBinary
         primeBitsSecretInBinary = bin(primeBitsSecret)[2:]
         paddedPrimeBitsSecretInBinary = primeBitsSecretInBinary
         if (( len(primeBitsSecretInBinary) % primeBits ) != 0):
@@ -363,15 +350,7 @@ def reconstructSecretFromShares(overallSharesCombined):
                 zerosToAddToPrimeBitsSecret = ( primeBits - (len(primeBitsSecretInBinary) % primeBits) )    
             else:
                 zerosPrepended = int(prependedCodepoints[0:16], 2)
-                lengthToMod = (len(prependedCodepoints) - 16 - zerosPrepended)
-                
-                print "zerosPrepended:", zerosPrepended
-                print "len(current overall secret):", len(prependedCodepoints)
-                print "len - 16 - zerosPrepended - :", (len(prependedCodepoints) - 16 - zerosPrepended - len(primeBitsSecretInBinary))
-                print "(16 - (x % 16)) - len(primeBitsSecretInBinary)", (( 16 - (lengthToMod % 16) ) - len(primeBitsSecretInBinary))  
-                
-                print "zerosPrepended:", zerosPrepended
-                
+                lengthToMod = (len(prependedCodepoints) - 16 - zerosPrepended)                
                 zerosToAddToPrimeBitsSecret = (( 16 - (lengthToMod % 16) ) - len(primeBitsSecretInBinary))     
             paddedPrimeBitsSecretInBinary = zerosToAddToPrimeBitsSecret*"0" + primeBitsSecretInBinary
             
@@ -431,7 +410,6 @@ def getChoice():
     print "#####"
     print "1). Split secret"
     print "2). Reconstruct secret"
-    print "3). Test"
     print "q). Quit"
     print ""
     choice = raw_input("Choice? ")
@@ -444,8 +422,6 @@ def menu():
             getOverallShares()
         elif (choice == "2"):
             readShares()
-        elif (choice == "3"):
-            test()
         else:
             print "Not a valid choice. Try again"
 
