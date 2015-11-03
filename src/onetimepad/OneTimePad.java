@@ -11,6 +11,7 @@ public class OneTimePad {
 
 	// Sets up hashMap for converting
 	private static final Map<String, Integer> lettersToNumbersMap;
+	private static Scanner s = new Scanner(System.in);
 
 	static {
 		lettersToNumbersMap = new HashMap<String, Integer>();
@@ -52,13 +53,20 @@ public class OneTimePad {
 	private static int[] getKey(String keyChoice, int lengthOfKey) {
 		int[] encryptionKey = new int[lengthOfKey];
 
+		// Creates a random key
 		if (keyChoice.equals("random")) {
 			try {
+
+				// Makes a SecureRandom instance and seeds with 2^20 bits
 				SecureRandom sr = SecureRandom.getInstance("SHA1PRNG", "SUN");
 				byte[] bytes = new byte[20];
 				sr.nextBytes(bytes);
 
+				// Sets the i_th index of encryptionKey to a random integer
+				// between 1 and modValue, inclusive
 				for (int i = 0; i < lengthOfKey; i++) {
+
+					// Avoids dividing by zero
 					int randomInt = sr.nextInt(modValue - 1) + 1;
 					encryptionKey[i] = randomInt;
 				}
@@ -72,6 +80,7 @@ public class OneTimePad {
 		return encryptionKey;
 	}
 
+	// Returns the ciphertext of convertedInput % encryptionKey
 	private static int[] getCipherText(int[] convertedInput, int[] encryptionKey) {
 		int[] ciphertext = new int[convertedInput.length];
 
@@ -81,43 +90,83 @@ public class OneTimePad {
 
 		return ciphertext;
 	}
+	
+	private static String getPlaintext(int[] encryptionKeyArray,int[] ciphertextArray, int textLength){
+		
+		int[] plaintextArray = new int[textLength];
+		
+//		map.entrySet()
+//	    .stream()
+//	    .filter(entry -> Objects.equals(entry.getValue(), value))
+//	    .map(Map.Entry::getKey)
+//	    .collect(Collectors.toSet());
+		
+		return "";
+	}
+	
+	private static int[] convertToIntArray(String inputString){
+		int convertedInput[] = new int[inputString.length()];
+		
+		// Converts the input text to an array of integers, according to the
+		// above hashMap
+		for (int i = 0; i < inputString.length(); i++) {
+			String character = Character.toString(inputString.charAt(i));
+
+			// If this character is a key in the hashMap, convert to to an
+			// integer
+			// If it isn't, set the integer to 28, a full stop
+			if (lettersToNumbersMap.keySet().contains(character)) {
+				int value = lettersToNumbersMap.get(character);
+				convertedInput[i] = value;
+			} else {
+				convertedInput[i] = 28;
+			}
+		}
+		
+		return convertedInput;
+	}
 
 	private static void encrypt() {
 
 		// Gets input text
-		Scanner s2 = new Scanner(System.in);
 		System.out.println("");
 		System.out.println("Enter text to convert: ");
-
-		String inputText = s2.nextLine();
-		int convertedInput[] = new int[inputText.length()];
-		int encryptionKey[] = new int[inputText.length()];
+		String inputText = s.nextLine().toLowerCase();
 		System.out.println("");
 
-		// Converts the input text to an array of integers, according to the
-		// above hashMap
-		for (int i = 0; i < inputText.length(); i++) {
-			String character = Character.toString(inputText.charAt(i));
-			int value = lettersToNumbersMap.get(character);
-			convertedInput[i] = value;
-		}
+		int convertedInput[] = convertToIntArray(inputText);
+		int encryptionKey[] = new int[inputText.length()];
 
-		System.out.println("Converted: ");
+		
+
+		//Prints the encryptionKey without the first and last commas
+		System.out.println("convertedInput:");
+		String convertedInputString = "";
 		for (int value : convertedInput) {
-			System.out.print(value + ", ");
+			convertedInputString = (convertedInputString + ", " + value);
 		}
+		convertedInputString = convertedInputString.substring(2, convertedInputString.length());
+		System.out.println(convertedInputString);
 		System.out.println("");
 
 		// Lets the user pick between having a random encryption key, or
 		// entering their own
 
-		System.out.println("");
 		System.out.println("Encryption key options:");
 		System.out.println("#1: Random key");
 		System.out.println("#2: User-entered key");
 		System.out.print("Choice: ");
-		int option = s2.nextInt();
-		s2.close();
+		
+		//Catches any number format errors
+		int option = 1;
+		try {
+			option = Integer.parseInt(s.nextLine());
+		} catch (NumberFormatException e){
+			System.out.println("NumberFormatException: " + e.getMessage());
+			System.out.println("NumberFormatException: " + e.getStackTrace());
+			
+		}
+		System.out.println("");
 
 		switch (option) {
 		case 1:
@@ -128,32 +177,88 @@ public class OneTimePad {
 			break;
 		}
 
-		System.out.println("");
-		System.out.println("encryptionKey:");
+		//Prints the encryptionKey without the first and last commas
+		System.out.println("encryptionKey (copy this):");
+		String encryptionKeyString = "";
 		for (int value : encryptionKey) {
-			System.out.print(value + ", ");
+			encryptionKeyString = (encryptionKeyString + ", " + value);
 		}
+		encryptionKeyString = encryptionKeyString.substring(2, encryptionKeyString.length());
+		System.out.println(encryptionKeyString);
 		System.out.println("");
 
 		// Gets ciphertext
 		int[] ciphertext = getCipherText(convertedInput, encryptionKey);
 
-		System.out.println("");
-		System.out.println("ciphertext:");
+		//Prints the ciphertext without the first and last commas
+		System.out.println("ciphertext (copy this):");
+		String ciphertextString = "";
 		for (int value : ciphertext) {
-			System.out.print(value + ", ");
+			ciphertextString = (ciphertextString + ", " + value);
 		}
+		ciphertextString = ciphertextString.substring(2, ciphertextString.length());
+		System.out.println(ciphertextString);
 		System.out.println("");
 	}
 
 	private static void decrypt() {
 
+		//Gets the encryptionKey as an array of integers
+		System.out.println("");
+		System.out.println("Enter encryptionKey: ");
+		String encryptionKeyString = s.nextLine();
+		
+		//Splits the input string by commas and spaces
+		String[] splitEncryptionKeyString = encryptionKeyString.split(", ");
+		int textLength = splitEncryptionKeyString.length;
+		
+		//Parses the string array to an int array
+		int[] encryptionKeyArray = new int[textLength];
+		for (int i = 0; i < textLength; i++){
+			encryptionKeyArray[i] = Integer.parseInt(splitEncryptionKeyString[i]);
+		}
+		
+		//Prints the encryptionKey without the first and last commas
+		System.out.println("encryptionKey (copy this):");
+		String encryptionKeyString2 = "";
+		for (int value : encryptionKeyArray) {
+			encryptionKeyString2 = (encryptionKeyString2 + ", " + value);
+		}
+		encryptionKeyString2 = encryptionKeyString2.substring(2, encryptionKeyString2.length());
+		System.out.println(encryptionKeyString2);
+		System.out.println("");
+		
+		//Gets the ciphertext as an array of integers
+		System.out.println("Enter ciphertext: ");
+		String ciphertextString = s.nextLine();
+		
+		//Splits the input string by commas and spaces
+		String[] splitCiphertextString = ciphertextString.split(", ");
+		
+		//Parses the string array to an int array
+		int[] ciphertextArray = new int[textLength];
+		for (int i = 0; i < textLength; i++){
+			ciphertextArray[i] = Integer.parseInt(splitCiphertextString[i]);
+		}
+		
+		//Prints the ciphertext without the first and last commas
+		System.out.println("ciphertext (copy this):");
+		String ciphertextString2 = "";
+		for (int value : ciphertextArray) {
+			ciphertextString2 = (ciphertextString2 + ", " + value);
+		}
+		ciphertextString2 = ciphertextString2.substring(2, ciphertextString2.length());
+		System.out.println(ciphertextString2);
+		System.out.println("");
+		
+		System.out.println("Original plaintext: ");
+		String plaintext = getPlaintext(encryptionKeyArray, ciphertextArray, textLength);
+		System.out.println(plaintext);		
+
 	}
 
 	public static void main(String[] args) {
 		System.out.println("lettersToNumbersMap: " + lettersToNumbersMap);
-
-		Scanner s = new Scanner(System.in);
 
 		// Lets the user pick between having a random encryption key, or
 		// entering their own
@@ -162,8 +267,15 @@ public class OneTimePad {
 		System.out.println("#1: Encryption");
 		System.out.println("#2: Decryption");
 		System.out.print("Choice: ");
-		int option = s.nextInt();
-		s.close();
+		
+		//Catches any number format errors
+		int option = 1;
+		try {
+			option = Integer.parseInt(s.nextLine());
+		} catch (NumberFormatException e){
+			System.out.println("NumberFormatException: " + e.getMessage());
+			System.out.println("NumberFormatException: " + e.getStackTrace());
+		}
 
 		switch (option) {
 		case 1:
@@ -173,6 +285,8 @@ public class OneTimePad {
 			decrypt();
 			break;
 		}
+
+		s.close();
 
 	}
 
