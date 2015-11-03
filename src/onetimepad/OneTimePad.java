@@ -2,6 +2,7 @@ package onetimepad;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 public class OneTimePad {
     
@@ -39,6 +40,25 @@ public class OneTimePad {
 	
 	public static void main(String[] args){
 		System.out.println("lettersToNumbersMap: " + lettersToNumbersMap);
+		
+		Scanner s = new Scanner(System.in);
+		String outputText = "";
+		System.out.println("Enter text to convert: ");
+		String inputText = s.nextLine();
+		s.close();
+		
+		System.out.println("");
+		
+		for (int i = 0; i < inputText.length(); i++){
+			String character = Character.toString( inputText.charAt(i) );
+			String value = lettersToNumbersMap.get(character).toString();
+			outputText = (outputText + "," + value);
+		}
+		outputText = outputText.substring(1, (outputText.length()) );
+		
+		System.out.println("Converted: ");
+		System.out.println(outputText);
+		
 	}
 	
 }
