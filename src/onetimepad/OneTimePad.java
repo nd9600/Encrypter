@@ -15,35 +15,35 @@ public class OneTimePad {
 
 	static {
 		lettersToNumbersMap = new HashMap<String, Integer>();
-		lettersToNumbersMap.put("a", 1);
-		lettersToNumbersMap.put("b", 2);
-		lettersToNumbersMap.put("c", 3);
-		lettersToNumbersMap.put("d", 4);
-		lettersToNumbersMap.put("e", 5);
-		lettersToNumbersMap.put("f", 6);
-		lettersToNumbersMap.put("g", 7);
-		lettersToNumbersMap.put("h", 8);
-		lettersToNumbersMap.put("i", 9);
-		lettersToNumbersMap.put("j", 10);
-		lettersToNumbersMap.put("k", 11);
-		lettersToNumbersMap.put("l", 12);
-		lettersToNumbersMap.put("m", 13);
-		lettersToNumbersMap.put("n", 14);
-		lettersToNumbersMap.put("o", 15);
-		lettersToNumbersMap.put("p", 16);
-		lettersToNumbersMap.put("q", 17);
-		lettersToNumbersMap.put("r", 18);
-		lettersToNumbersMap.put("s", 19);
-		lettersToNumbersMap.put("t", 20);
-		lettersToNumbersMap.put("u", 21);
-		lettersToNumbersMap.put("v", 22);
-		lettersToNumbersMap.put("w", 23);
-		lettersToNumbersMap.put("x", 24);
-		lettersToNumbersMap.put("y", 25);
-		lettersToNumbersMap.put("z", 26);
-		lettersToNumbersMap.put(" ", 27);
-		lettersToNumbersMap.put(".", 28);
-		lettersToNumbersMap.put(",", 29);
+		lettersToNumbersMap.put("a", 0);
+		lettersToNumbersMap.put("b", 1);
+		lettersToNumbersMap.put("c", 2);
+		lettersToNumbersMap.put("d", 3);
+		lettersToNumbersMap.put("e", 4);
+		lettersToNumbersMap.put("f", 5);
+		lettersToNumbersMap.put("g", 6);
+		lettersToNumbersMap.put("h", 7);
+		lettersToNumbersMap.put("i", 8);
+		lettersToNumbersMap.put("j", 9);
+		lettersToNumbersMap.put("k", 10);
+		lettersToNumbersMap.put("l", 11);
+		lettersToNumbersMap.put("m", 12);
+		lettersToNumbersMap.put("n", 13);
+		lettersToNumbersMap.put("o", 14);
+		lettersToNumbersMap.put("p", 15);
+		lettersToNumbersMap.put("q", 16);
+		lettersToNumbersMap.put("r", 17);
+		lettersToNumbersMap.put("s", 18);
+		lettersToNumbersMap.put("t", 19);
+		lettersToNumbersMap.put("u", 20);
+		lettersToNumbersMap.put("v", 21);
+		lettersToNumbersMap.put("w", 22);
+		lettersToNumbersMap.put("x", 23);
+		lettersToNumbersMap.put("y", 24);
+		lettersToNumbersMap.put("z", 25);
+		lettersToNumbersMap.put(" ", 26);
+		lettersToNumbersMap.put(".", 27);
+		lettersToNumbersMap.put(",", 28);
 	}
 
 	// Used in modding each character
@@ -51,7 +51,8 @@ public class OneTimePad {
 
 	// Converts the passed string to an array of integers
 	private static int[] convertToIntArray(String inputString) {
-		int convertedInput[] = new int[inputString.length()];
+		int textLength = inputString.length();
+		int convertedInput[] = new int[textLength];
 
 		// Converts the input text to an array of integers, according to the
 		// above hashMap
@@ -60,25 +61,31 @@ public class OneTimePad {
 
 			// If this character is a key in the hashMap, convert to to an
 			// integer
-			// If it isn't, set the integer to 28, a full stop
+			// If it isn't, set the integer to 27, a full stop
 			if (lettersToNumbersMap.keySet().contains(character)) {
 				int value = lettersToNumbersMap.get(character);
 				convertedInput[i] = value;
 			} else {
-				convertedInput[i] = 28;
+				convertedInput[i] = 27;
 			}
 		}
 
 		return convertedInput;
 	}
-	
-	//Converts the passed int array to a string
-	private static String convertToString(int[] intArray){
-		
+
+	// Converts the passed int array to a string
+	private static String convertToString(int[] intArray) {
+
 		String outputString = "";
-		for (int value : intArray) {
+
+		// Loops through the array
+		for (int elementInArray : intArray) {
+
+			// Loops through every key in the hashMap
 			for (String character : lettersToNumbersMap.keySet()) {
-				if (lettersToNumbersMap.get(character).equals(value)) {
+				// If the key is the same as the element in the array, add it to
+				// the string
+				if (lettersToNumbersMap.get(character).equals(elementInArray)) {
 					outputString = outputString + character;
 				}
 			}
@@ -132,12 +139,12 @@ public class OneTimePad {
 
 		int[] plaintextArray = new int[textLength];
 
-		//Works out the plaintext
+		// Works out the plaintext
 		for (int i = 0; i < textLength; i++) {
 			plaintextArray[i] = Math.floorMod(ciphertextArray[i] - encryptionKeyArray[i], modValue);
 		}
 
-		// Prints the encryptionKey without the first and last commas
+		// Prints the plaintextArra without the first and last commas
 		System.out.println("plaintextArray: ");
 		String plaintextArrayString = "";
 		for (int value : plaintextArray) {
@@ -148,7 +155,6 @@ public class OneTimePad {
 		System.out.println("");
 
 		String plaintext = convertToString(plaintextArray);
-
 		return plaintext;
 	}
 
@@ -209,6 +215,9 @@ public class OneTimePad {
 		}
 		encryptionKeyString = encryptionKeyString.substring(2, encryptionKeyString.length());
 		System.out.println(encryptionKeyString);
+
+		String encryptionKeyString2 = convertToString(encryptionKey);
+		System.out.println(encryptionKeyString2);
 		System.out.println("");
 
 		// Gets ciphertext
@@ -222,6 +231,9 @@ public class OneTimePad {
 		}
 		ciphertextString = ciphertextString.substring(2, ciphertextString.length());
 		System.out.println(ciphertextString);
+
+		String ciphertextString2 = convertToString(ciphertext);
+		System.out.println(ciphertextString2);
 		System.out.println("");
 	}
 
@@ -232,15 +244,9 @@ public class OneTimePad {
 		System.out.println("Enter encryptionKey: ");
 		String encryptionKeyString = s.nextLine();
 
-		// Splits the input string by commas and spaces
-		String[] splitEncryptionKeyString = encryptionKeyString.split(", ");
-		int textLength = splitEncryptionKeyString.length;
-
 		// Parses the string array to an int array
-		int[] encryptionKeyArray = new int[textLength];
-		for (int i = 0; i < textLength; i++) {
-			encryptionKeyArray[i] = Integer.parseInt(splitEncryptionKeyString[i]);
-		}
+		int[] encryptionKeyArray = convertToIntArray(encryptionKeyString);
+		int keyLength = encryptionKeyArray.length;
 
 		// Prints the encryptionKey without the first and last commas
 		System.out.println("encryptionKey:");
@@ -256,14 +262,8 @@ public class OneTimePad {
 		System.out.println("Enter ciphertext: ");
 		String ciphertextString = s.nextLine();
 
-		// Splits the input string by commas and spaces
-		String[] splitCiphertextString = ciphertextString.split(", ");
-
 		// Parses the string array to an int array
-		int[] ciphertextArray = new int[textLength];
-		for (int i = 0; i < textLength; i++) {
-			ciphertextArray[i] = Integer.parseInt(splitCiphertextString[i]);
-		}
+		int[] ciphertextArray = convertToIntArray(ciphertextString);
 
 		// Prints the ciphertext without the first and last commas
 		System.out.println("ciphertext :");
@@ -275,7 +275,7 @@ public class OneTimePad {
 		System.out.println(ciphertextString2);
 		System.out.println("");
 
-		String plaintext = getPlaintext(encryptionKeyArray, ciphertextArray, textLength);
+		String plaintext = getPlaintext(encryptionKeyArray, ciphertextArray, keyLength);
 		System.out.println("Original plaintext: ");
 		System.out.println(plaintext);
 
