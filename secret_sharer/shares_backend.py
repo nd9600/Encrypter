@@ -162,44 +162,6 @@ def splitSecret(secret, numberOfParts, threshold, primeBits = 8, padLength = 0):
 
     return overallSharesCombined
 
-def getOverallShares():
-    print ""
-    print "#####"
-    secret = raw_input("Secret: ")
-    codepointsInBinary = ""
-    padLength = 0
-    primeBits = 8
-
-    print ""
-
-    numberOfParts = input("Number of parts: ")
-    thresholdBooleanValue = False
-    threshold = 0
-    while not thresholdBooleanValue:
-        threshold = input("Threshold: ")
-        thresholdBooleanValue = insistentFunction(numberOfParts, threshold)
-
-    changePadLength = raw_input("Change pad length (default 0 bits) [y/N]: ")
-    if (changePadLength == "y"):
-        padLength = input("New pad length ie padLength = 2^bits (max 16): ")
-    if (padLength != 0):
-        padLength = 2**padLength
-
-    if (padLength > 65536):
-       padLength = 65536
-
-    changePrimeBits = raw_input("Change prime bits - ie prime = 2^bits (default %s) [y/N]: " % (primeBits))
-    if (changePrimeBits == "y"):
-        primeBits = input("New prime bits: ")
-
-    overallSharesCombined = splitSecret(secret, numberOfParts, threshold, primeBits, padLength)
-
-    print ""
-    print "Overall shares:"
-    for i in overallSharesCombined:
-        print str(i)[2:][:-2]
-    print "#####"
-
 def reconstructSecretFromShares(overallSharesCombined):
     print "overallSharesCombined:", overallSharesCombined
     print "overallSharesCombined[0]:", overallSharesCombined[0]
@@ -330,19 +292,3 @@ def reconstructSecretFromShares(overallSharesCombined):
         secret = secret + strChar
 
     return secret
-
-def readShares():
-    #Reads in shares and puts in a single list
-    print ""
-    print "#####"
-    overallSharesCombined = []
-    share = raw_input("Share (-1 to finish): ")
-    while (share != "-1"):
-        overallSharesCombined = overallSharesCombined + [[share]]
-        share = raw_input("Share (-1 to finish): ")
-    print ""
-    print "overallSharesCombined:", overallSharesCombined
-
-    secret = reconstructSecretFromShares(overallSharesCombined)
-    print "secret:", secret
-    print "#####"
