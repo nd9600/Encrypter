@@ -25,36 +25,22 @@ def menu():
         print ""
 
 def getOverallShares():
+    #Reads in secret and gets shares
+
     print ""
     print "#####"
     secret = raw_input("Secret: ")
-    codepointsInBinary = ""
-    padLength = 0
-    primeBits = 8
 
     print ""
 
-    numberOfParts = input("Number of parts: ")
+    numberOfParts = input("Total number of parts: ")
     thresholdBooleanValue = False
     threshold = 0
     while not thresholdBooleanValue:
-        threshold = input("Threshold: ")
+        threshold = input("Threshold number of parts: ")
         thresholdBooleanValue = insistentFunction(numberOfParts, threshold)
 
-    changePadLength = raw_input("Change pad length (default 0 bits) [y/N]: ")
-    if (changePadLength == "y"):
-        padLength = input("New pad length ie padLength = 2^bits (max 16): ")
-    if (padLength != 0):
-        padLength = 2**padLength
-
-    if (padLength > 65536):
-       padLength = 65536
-
-    changePrimeBits = raw_input("Change prime bits - ie prime = 2^bits (default %s) [y/N]: " % (primeBits))
-    if (changePrimeBits == "y"):
-        primeBits = input("New prime bits: ")
-
-    overallSharesCombined = splitSecret(secret, numberOfParts, threshold, primeBits, padLength)
+    overallSharesCombined = splitSecret(secret, numberOfParts, threshold)
 
     print ""
     print "Overall shares:"
@@ -63,7 +49,8 @@ def getOverallShares():
     print "#####"
 
 def readShares():
-    #Reads in shares and puts in a single list
+    #Reads in shares from user and prints out secret
+    
     print ""
     print "#####"
     overallSharesCombined = []
