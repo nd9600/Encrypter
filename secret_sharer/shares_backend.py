@@ -6,8 +6,8 @@ import polynomial_backend
 def splitSecret(secret, numberOfParts, threshold):
 
     #Gets an array of the bytes of the secret, in decimal
-    secretInDecimalBytes = list(bytearray(secret, "utf-8"))
-    #secretInBinary = map(ord,secret.encode('utf8'))
+    secretInDecimalBytes = list(bytearray(secret))#, "utf-8"))
+    #secretInDecimalBytes = map(ord,secret.encode('utf8'))
 
     #Makes a list that individual shares are appended to
     listOfShares = [(str(i) + "-") for i in range(1, numberOfParts+1)]
