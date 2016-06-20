@@ -14,7 +14,7 @@ def menu():
     choice = getChoice()
     while (choice != "q"):
         if (choice == "1"):
-            getOverallShares()
+            getCombinedShares()
         elif (choice == "2"):
             readShares()
         else:
@@ -24,7 +24,7 @@ def menu():
         print "#####"
         print ""
 
-def getOverallShares():
+def getCombinedShares():
     #Reads in secret and gets shares
 
     print ""
@@ -33,35 +33,35 @@ def getOverallShares():
 
     print ""
 
-    numberOfParts = input("Total number of parts: ")
-    thresholdBooleanValue = False
-    threshold = 0
-    while not thresholdBooleanValue:
-        threshold = input("Threshold number of parts: ")
-        thresholdBooleanValue = insistentFunction(numberOfParts, threshold)
+    totalParts = input("Total number of parts: ")
+    thresholdBoolean = False
+    thresholdParts = 0
+    while not thresholdBoolean:
+        thresholdParts = input("Threshold number of parts: ")
+        thresholdBoolean = insistentFunction(totalParts, thresholdParts)
 
-    overallSharesCombined = splitSecret(secret, numberOfParts, threshold)
+    combinedShares = splitSecret(secret, totalParts, thresholdParts)
 
     print ""
-    print "Overall shares:"
-    for i in overallSharesCombined:
-        print str(i)[2:][:-2]
+    print "Combined shares:"
+    for share in combinedShares:
+        print str(share)[2:][:-2]
     print "#####"
 
 def readShares():
     #Reads in shares from user and prints out secret
-    
+
     print ""
     print "#####"
-    overallSharesCombined = []
+    combinedShares = []
     share = raw_input("Share (q to finish): ")
     while (share != "q"):
-        overallSharesCombined = overallSharesCombined + [[share]]
+        combinedShares = combinedShares + [[share]]
         share = raw_input("Share (q to finish): ")
     print ""
-    print "overallSharesCombined:", overallSharesCombined
+    print "combinedShares:", combinedShares
 
-    secret = reconstructSecretFromShares(overallSharesCombined)
+    secret = reconstructSecretFromShares(combinedShares)
     print "secret:", secret
     print "#####"
 

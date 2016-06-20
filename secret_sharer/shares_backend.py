@@ -44,7 +44,7 @@ def getShares(secret, numberOfParts, threshold, primeBits):
 
         return shares
 
-def splitSecret(secret, numberOfParts, threshold, primeBits = 8, padLength = 0):
+def splitSecret(secret, numberOfParts, threshold):
     minimumPrimeBitsForNumberOfShares = int(math.ceil(math.log(numberOfParts, 2) + 1))
 
     #Converts secret to unicode codepoints to binary to decimal secret
