@@ -43,7 +43,7 @@ def getCombinedShares():
         print "Can't pick a threshold of 1, exiting"
         exit()
 
-    combinedShares = formatAndConvertSecret(secret, totalParts, thresholdParts)
+    combinedShares = getSharesFromFrontendSecret(secret, totalParts, thresholdParts)
 
     print ""
     print "Combined shares:"

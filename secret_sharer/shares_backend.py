@@ -8,7 +8,8 @@ def getShares(secret, numberOfParts, threshold):
     rng = random.SystemRandom()
     randomNumbers = {}
 
-    #Max value of each secret (since they are bytes is 255), 269 is prime
+    #Max value of each secret (since they are bytes is 255)
+    #269 is prime and bigger than 255, so we can use it
     modulus = 269
 
     #Picks _threshold-1_ random numbers
@@ -20,16 +21,17 @@ def getShares(secret, numberOfParts, threshold):
     print "numberOfParts:", numberOfParts
     print "randomNumbers:", randomNumbers
 
-    #If the secret is 0, we just return zero for the shares
+    #If the secret is 0, just return zero for the shares
     if (secret == 0):
         shares = []
         for i in range(1, numberOfParts+1):
-            shares.append(["%s-%s" % (str(i), str(0))])
+            shares.append( "%s-0" % (str(i)) )
 
         return shares
 
     else:
-        #Creates a polynomial of degree _threshold-1_, where x0 = secret and every other x is a term with a random coefficient
+        #Creates a polynomial of degree 'threshold-1', where x_0 = secret
+        #and every other x is a term with a random coefficient
         #and increasing power of x
         x, y = sympy.symbols('x, y')
         polynomial = secret
@@ -46,27 +48,37 @@ def getShares(secret, numberOfParts, threshold):
 
         return shares
 
-def splitSecret(secretInDecimalBytes, numberOfParts, threshold):
+def splitSecret(secret, numberOfParts, threshold):
+
+    #Gets an array of the bytes of the secret, in decimal
+    secretInDecimalBytes = list(bytearray(secret, "utf-8"))
+    #secretInBinary = map(ord,secret.encode('utf8'))
 
     print ""
-    print "secret: %s" % (secretInDecimalBytes)
+    print "secretInDecimalBytes: %s" % (secretInDecimalBytes)
     print "numberOfParts: %s" % (numberOfParts)
     print "threshold: %s" % (threshold)
 
     print ""
 
-    #Uses the byte form of the secret
-    #Gets 'numberOfParts' shares for each byte in the secret
-
+    #Makes a list that individual shares are appended to
     listOfShares = [(str(i) + "-") for i in range(1, numberOfParts+1)]
 
+    #Uses the byte form of the secret
+    #Gets 'numberOfParts' shares for each byte in the secret
     for byte in secretInDecimalBytes:
+
+        #Gets the shares for this portion of the secret
         individualShare = getShares(byte, numberOfParts, threshold)
 
         print "individualShare: %s" % (individualShare)
 
         for i in range(0, numberOfParts):
+
+            #Gets the number from the individual share and makes it 3 digits long
             decimalShare = individualShare[i][2:].zfill(3)
+
+            #Appends to the list of shares
             listOfShares[i]= listOfShares[i] + decimalShare
             print "decimalShare: %s" % (decimalShare)
 
@@ -74,20 +86,11 @@ def splitSecret(secretInDecimalBytes, numberOfParts, threshold):
 
     return listOfShares
 
-    #Converts binary codepoints to decimal, uses sections of _primeBits_ length as secrets
-    #and converts them to polynomial to points in polynomial to individual shares,
-    #pads share y-value to _primeBits_ length, combines into y-value, converts to decimal,
-    #to make overall shares of the form primeBits-x- collection of individual shares
+def getSharesFromFrontendSecret(secret, numberOfParts, threshold):
 
-def formatAndConvertSecret(secret, numberOfParts, threshold):
-    
-    #Gets an array of the bytes of the secret, in decimal
-    secretInDecimalBytes = list(bytearray(secret, "utf-8"))
-    #secretInBinary = map(ord,secret.encode('utf8'))
+    formattedSecret = secret
 
-    print "secretInDecimalBytes: %s" % (secretInDecimalBytes)
-
-    combinedShares = splitSecret(secretInDecimalBytes, numberOfParts, threshold)
+    combinedShares = splitSecret(formattedSecret, numberOfParts, threshold)
 
     return combinedShares
 
