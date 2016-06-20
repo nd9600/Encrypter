@@ -59,12 +59,14 @@ def readShares():
     combinedShares = []
     share = raw_input("Share (q to finish): ")
     while (share != "q"):
-        combinedShares = combinedShares + [[share]]
+        combinedShares = combinedShares + [share]
         share = raw_input("Share (q to finish): ")
     print ""
     print "combinedShares:", combinedShares
 
     secret = reconstructSecretFromShares(combinedShares)
+
+    print ""
     print "secret:", secret
     print "#####"
 

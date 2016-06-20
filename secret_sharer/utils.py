@@ -19,8 +19,8 @@ def getPolynomial(coordinates):
 
     #Creates a dictionary setOfPoints of the form
     #  {0: [[1,1], [2,0], [3,0], [4,0]], 1: [[1,0], [2,8], [3,0], [4,0]], 2: ...}
-    for i in range(0,numberOfPoints):
-        for j in range(0,numberOfPoints):
+    for i in range(0, numberOfPoints):
+        for j in range(0, numberOfPoints):
             if (j == i):
                 setOfPoints[i] = setOfPoints.get( i, [] ) + [[coordinates[i][0], coordinates[i][1]]]
             elif (j != i):

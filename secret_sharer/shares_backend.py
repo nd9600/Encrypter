@@ -76,7 +76,7 @@ def splitSecret(secret, numberOfParts, threshold):
         for i in range(0, numberOfParts):
 
             #Gets the number from the individual share and makes it 3 digits long
-            decimalShare = individualShare[i][2:].zfill(3)
+            decimalShare = individualShare[i].split("-")[1].zfill(3)
 
             #Appends to the list of shares
             listOfShares[i]= listOfShares[i] + decimalShare
@@ -94,12 +94,22 @@ def getSharesFromFrontendSecret(secret, numberOfParts, threshold):
 
     return combinedShares
 
-def reconstructSecretFromShares(overallSharesCombined):
-    print "overallSharesCombined:", overallSharesCombined
-    print "overallSharesCombined[0]:", overallSharesCombined[0]
-    print "overallSharesCombined[0][0]:", overallSharesCombined[0][0]
-    primeBits = int(str(overallSharesCombined[0][0]).split("-")[0])
-    print "primeBits:", primeBits
+def reconstructSecretFromShares(combinedShares):
+
+    for share in combinedShares:
+        splitShare = share.split("-")
+        xValue = int(splitShare[0])
+        yValues = []
+
+        yValuesString = splitShare[1]
+        for i in range(0, len(yValuesString), 3):
+            yValues.append(yValuesString[i:i+3])
+
+        print ""
+        print "xValue: %s" % (xValue)
+        print "yValues: %s" % (yValues)
+
+    return "Not done yet"
 
     allSharesForXValues = {}
     for i in overallSharesCombined:
