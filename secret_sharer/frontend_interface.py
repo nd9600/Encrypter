@@ -1,4 +1,5 @@
-from shares_backend import *
+from shares_backend import getSharesFromFrontendSecret, reconstructSecretFromShares
+from polynomial_backend import insistentFunction
 
 def getChoice():
     print ""
