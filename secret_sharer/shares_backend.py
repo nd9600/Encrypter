@@ -12,7 +12,7 @@ def getShares(secret, numberOfParts, threshold):
     modulus = 269
 
     #Picks _threshold-1_ random numbers
-    for i in range(0, threshold):
+    for i in range(1, threshold):
         randomNumbers[i] = rng.randint(1, modulus)
 
     print ""
@@ -33,7 +33,7 @@ def getShares(secret, numberOfParts, threshold):
         #and increasing power of x
         x, y = sympy.symbols('x, y')
         polynomial = secret
-        for i in range(0, threshold):
+        for i in range(1, threshold):
             polynomial = polynomial + (randomNumbers[i])*x**i
         print ""
         print "polynomial:", polynomial
@@ -42,7 +42,7 @@ def getShares(secret, numberOfParts, threshold):
         shares = []
         for i in range(1, numberOfParts+1):
             yValue = polynomial.subs(x, i) % modulus
-            shares.append(["%s-%s" % (str(i), str(yValue))])
+            shares.append( "%s-%s" % (str(i), str(yValue)) )
 
         return shares
 
@@ -58,11 +58,26 @@ def splitSecret(secretInDecimalBytes, numberOfParts, threshold):
     #Uses the byte form of the secret
     #Gets 'numberOfParts' shares for each byte in the secret
 
+    listOfShares = []
+
     for byte in secretInDecimalBytes:
         individualShare = getShares(byte, numberOfParts, threshold)
 
         print "individualShare: %s" % (individualShare)
+
+        for i in range(0, numberOfParts):
+            decimalShare = individualShare[i][2:]
+            print "decimalShare: %s" % (decimalShare)
+
         print "##########"
+
+    # print "listOfIndividualShares: %s" % (listOfIndividualShares)
+    #
+    # listOfNumberedShares = []
+    #
+    # for i in listOfIndividualShares:
+    #     for j in i:
+    #         listOfNumberedShares
 
     return ["Not", "done", "yet"]
 
