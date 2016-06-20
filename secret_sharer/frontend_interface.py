@@ -30,22 +30,20 @@ def getCombinedShares():
     print ""
     print "#####"
     secret = raw_input("Secret: ")
-
-    print ""
-
     totalParts = input("Total number of parts: ")
+    
     thresholdBoolean = False
     thresholdParts = 0
     while not thresholdBoolean:
         thresholdParts = input("Threshold number of parts: ")
         thresholdBoolean = insistentFunction(totalParts, thresholdParts)
 
-    combinedShares = splitSecret(secret, totalParts, thresholdParts)
+    combinedShares = formatAndConvertSecret(secret, totalParts, thresholdParts)
 
     print ""
     print "Combined shares:"
     for share in combinedShares:
-        print str(share)[2:][:-2]
+        print str(share)#[2:][:-2]
     print "#####"
 
 def readShares():

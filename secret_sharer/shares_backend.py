@@ -4,10 +4,12 @@ import math
 
 from utils import *
 
-def getShares(secret, numberOfParts, threshold, primeBits):
+def getShares(secret, numberOfParts, threshold):
     rng = random.SystemRandom()
     randomNumbers = {}
-    modulus = (2**primeBits)
+
+    #Max value of each secret (since they are bytes is 255), 269 is prime
+    modulus = 269
 
     #Picks _threshold-1_ random numbers
     for i in range(0, threshold):
@@ -44,64 +46,25 @@ def getShares(secret, numberOfParts, threshold, primeBits):
 
         return shares
 
-def splitSecret(secret, numberOfParts, threshold):
-    minimumPrimeBitsForNumberOfShares = int(math.ceil(math.log(numberOfParts, 2) + 1))
-
-    #Converts secret to unicode codepoints to binary to decimal secret
-    codepointsInBinary = ""
-    for c in secret:
-        unicodeCodepoint = ord(c)
-        codepointInBinary = bin(unicodeCodepoint)[2:]
-        sixteenBitCodepoint = (16-len(codepointInBinary))*"0" + codepointInBinary
-        codepointsInBinary =  codepointsInBinary + sixteenBitCodepoint
+def splitSecret(secretInDecimalBytes, numberOfParts, threshold):
 
     print ""
-    print "codepointsInBinary:", codepointsInBinary
-
-    #Pads overall codepoints by _padLength_ number of zeros
-    lengthOfCodepoints = len(codepointsInBinary)
-    zerosToAdd = 0
-    if ( (padLength != 0) and ( (lengthOfCodepoints%padLength) != 0 ) ):
-        zerosToAdd = ( padLength - (lengthOfCodepoints%padLength) )
-    paddedCodepoints = zerosToAdd*"0" + codepointsInBinary
-
-    #Pads zerosToAdd to a 16 bit integer, and prepends it to the padded codepoints
-    zerosToAddInBinary = bin(zerosToAdd)[2:]
-    lengthOfZerosToAddInBinary = len(zerosToAddInBinary)
-    zerosToAddToZerosToAdd = 0
-    if (lengthOfZerosToAddInBinary%16) != 0:
-        zerosToAddToZerosToAdd = ( 16 - (lengthOfZerosToAddInBinary%16) )
-    paddedZerosToAddInBinaryInBinary = zerosToAddToZerosToAdd*"0" + zerosToAddInBinary
-    prependedCodepoints = paddedZerosToAddInBinaryInBinary + paddedCodepoints
-
-    #Calculates new numberOfSections until _primeBits_ doesn't change
-    newPrimeBits1 = 0
-    newPrimeBits2 = primeBits
-    numberOfSections = 0
-    while (newPrimeBits1 != newPrimeBits2):
-        newPrimeBits1 = newPrimeBits2
-        numberOfSections = len(prependedCodepoints)/newPrimeBits1
-
-        minimumPrimeBitsForNumberOfSections = int(math.ceil(math.log(numberOfSections*2, 2) + 1))
-        minimumPrimeBits = max(minimumPrimeBitsForNumberOfSections, minimumPrimeBitsForNumberOfShares)
-        newPrimeBits2 = max(primeBits, minimumPrimeBits)
-    primeBits = newPrimeBits2
-    newNumberOfSections = len(prependedCodepoints)/primeBits
-
-    print ""
-    print "zerosToAdd:", zerosToAdd
-    print "zerosToAddInBinary:", zerosToAddInBinary
-    print "zerosToAddToZerosToAdd:", zerosToAddToZerosToAdd
-    print "paddedZerosToAddInBinaryInBinary:", paddedZerosToAddInBinaryInBinary
-    print "len(paddedZerosToAddInBinaryInBinary):", len(paddedZerosToAddInBinaryInBinary)
-    print "paddedCodepoints:", paddedCodepoints
-    print "prependedCodepoints:", prependedCodepoints
-    print "len(prependedCodepoints):", len(prependedCodepoints)
-    print "number of newPrimeBits sections:", newNumberOfSections
-    print "padLength: %s bits" % (padLength)
-    print "primeBits: %s bits" % (primeBits)
+    print "secret: %s" % (secretInDecimalBytes)
     print "numberOfParts: %s" % (numberOfParts)
     print "threshold: %s" % (threshold)
+
+    print ""
+
+    #Uses the byte form of the secret
+    #Gets 'numberOfParts' shares for each byte in the secret
+
+    for byte in secretInDecimalBytes:
+        individualShare = getShares(byte, numberOfParts, threshold)
+
+        print "individualShare: %s" % (individualShare)
+        print "##########"
+
+    return ["Not", "done", "yet"]
 
     #Converts binary codepoints to decimal, uses sections of _primeBits_ length as secrets
     #and converts them to polynomial to points in polynomial to individual shares,
@@ -161,6 +124,17 @@ def splitSecret(secret, numberOfParts, threshold):
     #print "overallSharesCombined:", overallSharesCombined
 
     return overallSharesCombined
+
+def formatAndConvertSecret(secret, numberOfParts, threshold):
+    #Gets an array of the bytes of the secret, in decimal
+    secretInDecimalBytes = list(bytearray(secret, "utf-8"))
+    #secretInBinary = map(ord,secret.encode('utf8'))
+
+    print "secretInDecimalBytes: %s" % (secretInDecimalBytes)
+
+    combinedShares = splitSecret(secretInDecimalBytes, numberOfParts, threshold)
+
+    return combinedShares
 
 def reconstructSecretFromShares(overallSharesCombined):
     print "overallSharesCombined:", overallSharesCombined
