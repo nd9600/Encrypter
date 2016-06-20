@@ -31,12 +31,17 @@ def getCombinedShares():
     print "#####"
     secret = raw_input("Secret: ")
     totalParts = input("Total number of parts: ")
-    
+
     thresholdBoolean = False
     thresholdParts = 0
     while not thresholdBoolean:
         thresholdParts = input("Threshold number of parts: ")
         thresholdBoolean = insistentFunction(totalParts, thresholdParts)
+
+    if (thresholdParts == 1):
+        print ""
+        print "Can't pick a threshold of 1, exiting"
+        exit()
 
     combinedShares = formatAndConvertSecret(secret, totalParts, thresholdParts)
 

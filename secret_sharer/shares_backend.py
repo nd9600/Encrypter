@@ -58,7 +58,7 @@ def splitSecret(secretInDecimalBytes, numberOfParts, threshold):
     #Uses the byte form of the secret
     #Gets 'numberOfParts' shares for each byte in the secret
 
-    listOfShares = []
+    listOfShares = [(str(i) + "-") for i in range(1, numberOfParts+1)]
 
     for byte in secretInDecimalBytes:
         individualShare = getShares(byte, numberOfParts, threshold)
@@ -66,81 +66,21 @@ def splitSecret(secretInDecimalBytes, numberOfParts, threshold):
         print "individualShare: %s" % (individualShare)
 
         for i in range(0, numberOfParts):
-            decimalShare = individualShare[i][2:]
+            decimalShare = individualShare[i][2:].zfill(3)
+            listOfShares[i]= listOfShares[i] + decimalShare
             print "decimalShare: %s" % (decimalShare)
 
         print "##########"
 
-    # print "listOfIndividualShares: %s" % (listOfIndividualShares)
-    #
-    # listOfNumberedShares = []
-    #
-    # for i in listOfIndividualShares:
-    #     for j in i:
-    #         listOfNumberedShares
-
-    return ["Not", "done", "yet"]
+    return listOfShares
 
     #Converts binary codepoints to decimal, uses sections of _primeBits_ length as secrets
     #and converts them to polynomial to points in polynomial to individual shares,
     #pads share y-value to _primeBits_ length, combines into y-value, converts to decimal,
     #to make overall shares of the form primeBits-x- collection of individual shares
-    overallSharesDictionary = {}
-    count = 0
-    listOfSecretsInDecimal = []
-    sharesForEachPrimeBitsLength = {}
-    for i in range(0, len(prependedCodepoints), primeBits):
-        count = i/primeBits
-        bits = prependedCodepoints[i:i+primeBits]
-        decimalBits = int(bits, 2)
-        listOfSecretsInDecimal.append(decimalBits)
-
-        #print ""
-        #print "%sth %s bits: %s" % (count, primeBits , bits)
-        #print "%sth %s bits in decimal: %s" % (count, primeBits , decimalBits)
-        individualShare = getShares(decimalBits, numberOfParts, threshold, primeBits)
-        sharesForEachPrimeBitsLength[count] = [individualShare[0][0], individualShare[1][0]]
-        print "bits:", bits
-        print "decimalBits:", decimalBits
-        print "individualShare:", individualShare
-        for j in range(1, numberOfParts+1):
-            overallSharesDictionary[j] = overallSharesDictionary.get(j, []) + individualShare[j-1]
-    print ""
-    print "listOfSecretsInDecimal:", listOfSecretsInDecimal
-
-    for i in range(0, len(sharesForEachPrimeBitsLength)):
-        print "sharesForEachPrimeBitsLength[%s]: %s" % (i, sharesForEachPrimeBitsLength[i])
-
-    print "sharesForEachPrimeBitsLength:", sharesForEachPrimeBitsLength
-    #print "overallSharesDictionary:", overallSharesDictionary
-    #print "count:", count
-
-    print ""
-    overallSharesCombined = []
-    for i in overallSharesDictionary:
-        yValue = ""
-        for j in overallSharesDictionary[i]:
-            splitShare = j.split("-")
-            shareValue = int(splitShare[1])
-            shareValueInBinary = bin(shareValue)[2:]
-            lengthOfShareValueInBinary = len(shareValueInBinary)
-
-            zerosToAddToShareValue = 0
-            if (lengthOfShareValueInBinary%primeBits) != 0:
-                zerosToAddToShareValue = ( primeBits - (lengthOfShareValueInBinary%primeBits) )
-            primeBitsLengthShareValue = zerosToAddToShareValue*"0" + shareValueInBinary
-            yValue = yValue + primeBitsLengthShareValue
-        #print "Binary yValue:", yValue
-        yValue = int(yValue, 2)
-        ithShare = ["%s-%s-%s" % (str(primeBits), str(i), str(yValue))]
-        #print "Decimal yValue:", yValue
-        #print "%sth share: %s" % (i, ithShare)
-        overallSharesCombined = overallSharesCombined + [ithShare]
-    #print "overallSharesCombined:", overallSharesCombined
-
-    return overallSharesCombined
 
 def formatAndConvertSecret(secret, numberOfParts, threshold):
+    
     #Gets an array of the bytes of the secret, in decimal
     secretInDecimalBytes = list(bytearray(secret, "utf-8"))
     #secretInBinary = map(ord,secret.encode('utf8'))
